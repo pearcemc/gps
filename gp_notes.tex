@@ -1,0 +1,74 @@
+\documentclass{article}
+
+\usepackage{amsmath,amssymb}
+
+\begin{document}
+
+\section{The situation}
+
+We want a model to account for the growth patterns of axons. It is conjectured that certain chemicals, present in a location, will encourage or discourage growth towards that area.
+
+\section{Modelling notes}
+
+Suppose we model the movement of an axon's tip as a particle in a two dimensional space. Then, we would expect its course over time to exhibit:
+
+\begin{itemize}
+ \item A high correlation between location at time $t$ and $t+1$ - no big jumps in location; assuming the time difference is not large.
+ \item Perhaps even conditional independence between location at $t$ and at $t-2, t-3, ...$ given location at time $t-1$.
+ \item Movement towards or away from the location of chemicals.
+\end{itemize}
+
+We do not get to see this axon-tip particle, however. We get a series of images. 
+
+At each moment, the axon-tip particle lays down some axon as it goes. We could visualise this as the difference between two frames of a film: what has just been added to the image?
+
+The structure laid down by growth of the axon might be modelled as additive over time. The visual scene at time $t$ is the sum of the visual scenes at time $t-1, t-2,...$ and the new axon accretion from time $t$ itself.
+
+\section{A model for the axon-tip}
+
+First, can we formalise the movement of the axon-tip particle as obeying a Gaussian process? Suppose the location of the chemical is $(c_1,c_2)^T$. 
+
+Let's think about the $x$ co-ordinate at time $t$ being recorded at $z_i$ where $i=2t+1$ and the $y$ co-ordinate at $z_j$ where $j=2t+2$.
+
+A possible mean function is:
+
+\begin{flalign*}
+  & \text{M}(Z_i) = \begin{cases} c_1 &\mbox{if } (-1)^{i}<0 \\ 
+ c_2 & \mbox{if } (-1)^{i}>0 \end{cases}  \\
+\end{flalign*}
+
+A possible covariance kernel is:
+
+\begin{flalign*}
+  & \text{K}(Z_i,Z_j) = \begin{cases} \exp(-g||i-j||) + \sigma^2 \delta_{ij} &\mbox{if } (-1)^{i+j}>0 \\ 
+ 0 & \mbox{if } (-1)^{i+j}<0 \end{cases}  \\
+\end{flalign*}
+
+Where $\delta_{ij}=1$ iff $i=j$. Giving rise to the model:
+
+\begin{flalign*}
+  & Z \sim \text{GP}(M,K) \\
+\end{flalign*}
+ 
+\subsection{Using the model}
+
+If we observe that the axon-tip begins in a particular location $\mathbf z=(z_1,z_2)^T$ then we can condition on this information.  Then the mathematics of normal distributions has it that for some other points $\mathbf f$:
+
+\begin{flalign*}
+& \left[\begin{array}{c} \mathbf z \\ \mathbf f  \end{array} \right] \sim N\left( 
+\left[\begin{array}{c} M(\mathbf z) \\ M(\mathbf f)  \end{array} \right] ,
+\left[\begin{array}{cc} K(\mathbf z, \mathbf z) & K(\mathbf z, \mathbf f) \\
+K(\mathbf f, \mathbf z) & K(\mathbf f, \mathbf f) \end{array} \right] 
+\right)
+\end{flalign*}
+
+From which the conditional distribution of the new points is:
+
+\begin{flalign*}
+& \mathbb E [\mathbf f |\mathbf z] =
+ M(\mathbf f) + K(\mathbf f, \mathbf z) K(\mathbf z, \mathbf z)^{-1}(\mathbf z - M(\mathbf z)) \\
+ & \text{Cov}(\mathbf f |\mathbf z) \left[\begin{array}{cc} K(\mathbf z, \mathbf z) & K(\mathbf z, \mathbf f) \\
+K(\mathbf f, \mathbf z) & K(\mathbf f, \mathbf f) \end{array} \right] 
+\end{flalign*}
+
+\end{document}
