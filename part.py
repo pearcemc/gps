@@ -1,4 +1,5 @@
 from pylab import *
+from copy import deepcopy
 
 def meanf(Xi,c1,c2):
   if (-1)**Xi[0,1] <0:
@@ -35,6 +36,11 @@ def evalK(A,B,K):
       C[i,j] = K(A[i,:],B[j,:])
   return C
 
+def plot_xy(E,color="blue"):
+  B = deepcopy(E)
+  if not B.shape[1] == 2:
+    B.shape = (E.shape[0]/2,2)
+  plot( array(B[:,0].T)[0],array(B[:,1].T)[0], color=color )
 
 c1 = 5.
 c2 = 5.
@@ -56,8 +62,6 @@ for i in range(N):
   Xf[2*i,:]= matrix([T[i],0])
   Xf[2*i + 1,:]= matrix([T[i],1])
 
-no = Xz.shape[0]
-ns = Xf.shape[1]
 
 Kzz = evalK(Xz,Xz,K)
 Kzf = evalK(Xz,Xf,K)
@@ -66,3 +70,28 @@ Kff = evalK(Xf,Xf,K)
 
 Ef = evalM(Xf,M) + Kfz * Kzz.I * ( z - evalM(Xz,M) )
 Ef
+
+Vf = Kff - Kfz * Kzz.I * Kzf
+
+qchisq = 2.448
+Cn = 100
+C = matrix(zeros((Cn,2)))
+T = linspace(0,2*pi,Cn)
+for i in range(Cn):
+  C[i,0] = cos(T[i])
+  C[i,1] = sin(T[i])
+
+def do_curve(V,i):
+  eva, eve = eig(Vf[2*i:2*i + 2,2*i:2*i + 2])
+  return C * eve * diag(eva**.5) * qchisq
+
+def make_stack(v,n):
+  R = matrix(zeros((n,2)))
+  for i in range(n):
+    R[i,:] = v
+  return R
+
+plot_xy(Ef)
+for i in range(Xf.shape[0]/2):
+  L = do_curve(Vf,i) + make_stack(Ef[2*i:2*i + 2,:].T,Cn)
+  plot_xy(L,color='red') 
