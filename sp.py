@@ -25,7 +25,7 @@ M = makeM(2.,2.,-1.)
 K = makeK(0.1,1.,2.)
 
 R = 50
-S = linspace(0,50,R)
+S = linspace(0,5,R)
 
 EY = matrix(zeros((R,R)))
 for i in range(R):
@@ -33,3 +33,4 @@ for i in range(R):
     EY[i,j] = M(S[i],S[j])
 
 imshow(EY)
+show()
